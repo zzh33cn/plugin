@@ -1,15 +1,25 @@
 language: go
+go_import_path: github.com/33cn/plugin
 sudo: false
 notifications:
   email: false
 jobs:
   include:
     - stage: test
-      go_import_path: github.com/33cn/plugin
-      install: skip
+      sudo: false
+      install:
+        - go get -u gopkg.in/alecthomas/gometalinter.v2
+        - go get -u mvdan.cc/sh/cmd/shfmt
+        - go get -u mvdan.cc/sh/cmd/gosh
+        - apt install clang-format
+        - apt install shellcheck
       os: linux
+      dist: xenial
       go:
         - "1.9"
         - master
       script:
-        - make test
+        #- make test
+        - make fmt
+        - make checkgofmt
+        - make linter
