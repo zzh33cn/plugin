@@ -11,8 +11,8 @@ jobs:
         - go get -u gopkg.in/alecthomas/gometalinter.v2
         - go get -u mvdan.cc/sh/cmd/shfmt
         - go get -u mvdan.cc/sh/cmd/gosh
-        - apt install clang-format
-        - apt install shellcheck
+        - sudo apt install clang-format
+        - sudo apt install shellcheck
       os: linux
       dist: xenial
       go:
