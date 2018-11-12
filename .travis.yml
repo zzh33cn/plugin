@@ -10,6 +10,7 @@ jobs:
       install:
         - go get -u golang.org/x/tools/cmd/goimports
         - go get -u gopkg.in/alecthomas/gometalinter.v2
+        - gometalinter.v2 -i
         - go get -u mvdan.cc/sh/cmd/shfmt
         - go get -u mvdan.cc/sh/cmd/gosh
       os: linux
