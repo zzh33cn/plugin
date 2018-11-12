@@ -11,15 +11,12 @@ jobs:
         - go get -u gopkg.in/alecthomas/gometalinter.v2
         - go get -u mvdan.cc/sh/cmd/shfmt
         - go get -u mvdan.cc/sh/cmd/gosh
-        - sudo apt install clang-format
-        - sudo apt install shellcheck
       os: linux
       dist: xenial
       go:
         - "1.9"
         - master
       script:
-        #- make test
-        - make fmt
-        - make checkgofmt
+        - make fmt_go
         - make linter
+        - make test
