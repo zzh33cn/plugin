@@ -6,7 +6,7 @@ notifications:
 jobs:
   include:
     - stage: test
-      sudo: false
+      sudo: require
       install:
         - go get -u gopkg.in/alecthomas/gometalinter.v2
         - go get -u mvdan.cc/sh/cmd/shfmt
