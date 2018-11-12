@@ -1,5 +1,15 @@
 language: go
-
-go:
-  - "1.9"
-  - master
+sudo: false
+notifications:
+  email: false
+jobs:
+  include:
+    - stage: test
+      go_import_path: github.com/33cn/plugin
+      install: skip
+      os: linux
+      go:
+        - "1.9"
+        - master
+      script:
+        - make test
