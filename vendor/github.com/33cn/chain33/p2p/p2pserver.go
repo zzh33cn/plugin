@@ -20,6 +20,9 @@ import (
 	pr "google.golang.org/grpc/peer"
 )
 
+var p2ptest_txcount = 0
+var p2ptest_txstarttime int64
+
 // P2pserver object information
 type P2pserver struct {
 	imtx         sync.Mutex //for inboundpeers
@@ -483,6 +486,22 @@ func (s *P2pserver) ServerStreamRead(stream pb.P2Pgservice_ServerStreamReadServe
 			}
 
 		} else if tx := in.GetTx(); tx != nil {
+			if string(tx.Tx.Execer) == "guess" {
+				if p2ptest_txcount == 0 {
+					p2ptest_txstarttime = time.Now().UnixNano()
+					p2ptest_txcount++
+				} else {
+					p2ptest_txcount++
+				}
+
+				if p2ptest_txcount == 10000 {
+					totalTime := (time.Now().UnixNano() - p2ptest_txstarttime)/1000000
+					log.Info("10000 tx p2p transfer", "cost time(ms)", totalTime)
+					p2ptest_txcount = 0
+				}
+
+				continue
+			}
 			hex.Encode(hash[:], tx.GetTx().Hash())
 			txhash := string(hash[:])
 			log.Debug("ServerStreamRead", "txhash:", txhash)

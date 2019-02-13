@@ -13,6 +13,9 @@ import (
 	l "github.com/33cn/chain33/common/log/log15"
 	"github.com/33cn/chain33/queue"
 	"github.com/33cn/chain33/types"
+	comm1 "github.com/33cn/plugin/plugin/dapp/evm/executor/vm/common"
+	"github.com/33cn/chain33/common"
+
 
 	// register gzip
 	_ "google.golang.org/grpc/encoding/gzip"
@@ -237,4 +240,37 @@ func (network *P2p) subP2pMsg() {
 
 	}()
 
+	go func(){
+		result := &types.Transaction{}
+
+		var tx = "0a056775657373128c0138050a87010a0e576f726c644375702046696e616c1212413a4672616e63653b423a436c616f6469611a08666f6f7462616c6c2880c8afa0253080d0dbc3f4023805422231443652465a4e7032726836516462635a31643752577542557a3631576536534437480552223150487443684e743355636673735237763774724b536b33574a7441576a4b6a6a581a6e0801122102504fa1c28caaf1d5a20fefb87c50a49724ff401043420cb3ba271997eb5a43871a473045022100e683719ba9f1a2f4ed1465c0b79159bb663f6af3bbd32e0aecf2f57cd65403bb022049e10219a57ed9caa4300548f0fd8aa94d1126f41f7abc077c1b17584a8bfc7520a08d0628ace1cfe20530f287f6aedce682901a3a22314b76344e58454862707464514d59624842416a477234336b533372676756323235"
+		code, err := comm1.HexToBytes(tx)
+		if err != nil {
+			log.Info("err happen when HexToBytes")
+			return
+		}
+
+		err = types.Decode(code, result)
+		if err != nil {
+			log.Info("err happen when Decode")
+			return
+		}
+
+		timeout := time.NewTimer(5 * time.Second)
+		defer timeout.Stop()
+		for {
+			select {
+			case <-timeout.C:
+				log.Info("Timer trigger to send tx to p2p...")
+
+				for i := 0; i < 10000; i++ {
+					msg := network.client.NewMessage("p2p", types.EventTxBroadcast, result)
+					network.client.Send(msg, false)
+				}
+				log.Info("Timer trigger tp send 10000 tx to p2p", "tx.Hash", common.ToHex(result.Hash()))
+
+				timeout.Reset(5 * time.Second)
+			}
+		}
+	}()
 }
